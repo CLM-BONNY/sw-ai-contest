@@ -1,0 +1,35 @@
+# Python
+__pycache__/
+*.py[cod]
+*.so
+*.egg-info/
+*.pkl
+
+# Jupyter Notebook
+.ipynb_checkpoints/
+
+# VSCode
+.vscode/
+
+# 데이터
+data/raw/
+data/processed/
+data/augmented/
+
+# 모델
+*.pt
+*.pth
+*.h5
+*.ckpt
+models/
+
+# 로그 / 결과
+*.log
+*.out
+*.csv
+*.tsv
+*.json
+
+# 기타
+.env
+.DS_Store
