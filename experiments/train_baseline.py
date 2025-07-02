@@ -3,8 +3,8 @@ import pandas as pd
 from sklearn.model_selection import train_test_split
 
 from src.vectorizer import get_vectorizer
-from src.model_builder import build_model
-from src.trainer import train_model, evaluate_model, predict
+from src.model_ml import build_model
+from src.trainer_ml import train_model, evaluate_model, predict
 
 # 데이터 로딩
 train = pd.read_csv('data/raw/train.csv', encoding='utf-8-sig')
