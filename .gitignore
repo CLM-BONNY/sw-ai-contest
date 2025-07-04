@@ -24,6 +24,7 @@ data/augmented/
 models/
 
 # 로그 / 결과
+.logs/
 *.log
 *.out
 *.csv

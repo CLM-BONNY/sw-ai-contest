@@ -1,0 +1,10 @@
+model_name: "bert-base-uncased"
+train_path: "data/raw/train.csv"
+save_path: "models/hf_checkpoint"
+max_length: 512
+batch_size: 16
+epochs: 3
+seed: 42
+num_labels: 2
+lr: 5e-5
+weight_decay: 0.01

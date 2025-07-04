@@ -1,0 +1,18 @@
+# 데이터 처리
+pandas==2.2.2
+numpy==1.26.4
+pyyaml==6.0.1
+scikit-learn==1.5.0
+
+# 모델 학습
+torch==2.3.0
+transformers==4.41.1
+datasets==2.19.1
+accelerate==0.30.1
+wandb==0.16.6
+
+# 대시보드
+streamlit==1.35.0
+
+# 로깅 및 기타 유틸
+tqdm==4.66.4
