@@ -4,8 +4,16 @@ from utils.logger import get_logger
 
 logger = get_logger(__name__)
 
+
 # Hugging Face Trainer 활용 모델 학습 함수
-def train_model(model, tokenizer, train_dataset, eval_dataset, output_dir="models/hf_checkpoint", config=None):
+def train_model(
+    model,
+    tokenizer,
+    train_dataset,
+    eval_dataset,
+    output_dir="models/hf_checkpoint",
+    config=None,
+):
     # 학습 관련 설정 정의
     training_args = TrainingArguments(
         output_dir=output_dir,
@@ -21,7 +29,7 @@ def train_model(model, tokenizer, train_dataset, eval_dataset, output_dir="model
         save_total_limit=1,
         load_best_model_at_end=True,
         metric_for_best_model="accuracy",
-        report_to="none"  # wandb 사용 시 'wandb'
+        report_to="none",  # wandb 사용 시 'wandb'
     )
 
     # Hugging Face Trainer 생성
@@ -31,7 +39,7 @@ def train_model(model, tokenizer, train_dataset, eval_dataset, output_dir="model
         train_dataset=train_dataset,
         eval_dataset=eval_dataset,
         tokenizer=tokenizer,
-        compute_metrics=compute_metrics
+        compute_metrics=compute_metrics,
     )
 
     # 모델 학습 수행 및 로그 출력

@@ -2,6 +2,7 @@ import logging
 import os
 from datetime import datetime
 
+
 # 로깅 설정 반환 함수
 def get_logger(name, save_dir="logs"):
     # 로그 파일 경로 설정
@@ -16,7 +17,7 @@ def get_logger(name, save_dir="logs"):
 
     # 기존 핸들러 제거 (중복 방지)
     if logger.hasHandlers():
-        logger.handlers.clear()  
+        logger.handlers.clear()
 
     # 콘솔 핸들러 생성
     console_handler = logging.StreamHandler()

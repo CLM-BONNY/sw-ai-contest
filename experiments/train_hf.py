@@ -36,13 +36,22 @@ logger = get_logger("HF-Train")
 df = pd.read_csv(train_path)
 df = df.rename(columns={"paragraph_text": "full_text"})  # 열 이름 통일
 
-train_df, val_df = train_test_split(df, test_size=0.2, stratify=df["generated"], random_state=seed)
+train_df, val_df = train_test_split(
+    df, test_size=0.2, stratify=df["generated"], random_state=seed
+)
 
 # 토크나이저 로딩
 tokenizer = get_tokenizer(model_name)
 
+
 def tokenize(example):
-    return tokenizer(example["full_text"], padding="max_length", truncation=True, max_length=max_length)
+    return tokenizer(
+        example["full_text"],
+        padding="max_length",
+        truncation=True,
+        max_length=max_length,
+    )
+
 
 train_dataset = Dataset.from_pandas(train_df)
 val_dataset = Dataset.from_pandas(val_df)
