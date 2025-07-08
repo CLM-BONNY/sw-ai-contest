@@ -21,15 +21,15 @@ def train_model(
         save_strategy="epoch",
         logging_dir=f"{output_dir}/logs",
         logging_steps=50,
-        per_device_train_batch_size=config.get("train_batch_size", 8),
-        per_device_eval_batch_size=config.get("eval_batch_size", 8),
-        num_train_epochs=config.get("epochs", 3),
-        learning_rate=config.get("lr", 5e-5),
-        weight_decay=config.get("weight_decay", 0.01),
+        per_device_train_batch_size=config["train_batch_size"],
+        per_device_eval_batch_size=config["eval_batch_size"],
+        num_train_epochs=config["epochs"],
+        learning_rate=config["lr"],
+        weight_decay=config["weight_decay"],
         save_total_limit=1,
         load_best_model_at_end=True,
-        metric_for_best_model="accuracy",
-        report_to="none",  # wandb 사용 시 'wandb'
+        metric_for_best_model="roc_auc",
+        report_to="wandb",  # wandb 사용 시 'wandb'
     )
 
     # Hugging Face Trainer 생성

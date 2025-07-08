@@ -1,21 +1,21 @@
-import os
 import yaml
+import wandb
 import pandas as pd
 from sklearn.model_selection import train_test_split
 
-from transformers import TrainingArguments, Trainer
 from datasets import Dataset
 
 from src.tokenizer_hf import get_tokenizer
 from src.model_hf import get_model
-from src.trainer_hf import compute_metrics, train_model
+from src.trainer_hf import train_model
 from utils.seed import set_seed
-from utils.logger import get_logger
+from utils.logger import get_logger, log_metrics
 
 # config 파일 내부 설정 로딩
 with open("config/config.yaml", "r") as f:
     config = yaml.safe_load(f)
 
+project_name = config["project_name"]
 model_name = config["model_name"]
 train_path = config["train_path"]
 save_path = config["save_path"]
@@ -27,6 +27,26 @@ num_labels = config["num_labels"]
 lr = config["lr"]
 weight_decay = config["weight_decay"]
 
+# run name 설정
+run_name = f"{model_name}-lr{lr}-bs{batch_size}-ep{epochs}"
+
+# 로거 설정
+logger = get_logger("HF-Train")
+
+# W&B 설정
+wandb.init(
+    project=project_name,
+    name=run_name,
+    config={
+        "model": model_name,
+        "lr": lr,
+        "batch_size": batch_size,
+        "epochs": epochs,
+        "weight_decay": weight_decay,
+        "max_length": max_length,
+        "seed": seed,
+    },
+)
 
 # 시드 고정 및 로깅 설정
 set_seed(seed)
@@ -91,4 +111,10 @@ logger.info("Saving model...")
 trainer.save_model(save_path)
 tokenizer.save_pretrained(save_path)
 
+# 최종 성능 평가 및 로깅 (W&B + 콘솔 + 파일)
+final_metrics = trainer.evaluate()
+log_metrics(logger, final_metrics)
+
 logger.info("Training completed.")
+
+wandb.finish()

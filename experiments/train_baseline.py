@@ -1,14 +1,50 @@
+import yaml
 import time
+import wandb
 import pandas as pd
 from sklearn.model_selection import train_test_split
 
 from src.vectorizer import get_vectorizer
 from src.model_ml import build_model
 from src.trainer_ml import train_model, evaluate_model, predict
+from utils.logger import get_logger, log_metrics
+
+# config 파일 내부 설정 로딩
+with open("config/config.yaml", "r") as f:
+    config = yaml.safe_load(f)
+
+project_name = config["project_name"]
+model_name = config["model_name"]
+train_path = config["train_path"]
+predict_path = config["predict_path"]
+test_path = config["test_path"]
+vectorizer_type = config["vectorizer"]
+scale_pos_weight = config["scale_pos_weight"]
+random_state = config["seed"]
+n_estimators = config["n_estimators"]
+
+# run name 설정
+run_name = f"{model_name}-w{scale_pos_weight}-n{n_estimators}"
+
+# 로거 설정
+logger = get_logger("XGBoost-Baseline")
+
+# W&B 설정
+wandb.init(
+    project=project_name,
+    name=run_name,
+    config={
+        "model": model_name,
+        "vectorizer": vectorizer_type,
+        "scale_pos_weight": scale_pos_weight,
+        "random_state": random_state,
+        "n_estimators": n_estimators,
+    },
+)
 
 # 데이터 로딩
-train = pd.read_csv("data/raw/train.csv", encoding="utf-8-sig")
-test = pd.read_csv("data/raw/test.csv", encoding="utf-8-sig")
+train = pd.read_csv(train_path, encoding="utf-8-sig")
+test = pd.read_csv(test_path, encoding="utf-8-sig")
 
 # 라벨과 입력 분리
 X = train[["title", "full_text"]]
@@ -29,7 +65,12 @@ print(f"소요 시간: {time.time() - start_time:.2f}초")
 print("모델 학습 및 평가 시작")
 model = build_model()
 model = train_model(model, X_train_vec, y_train)
-evaluate_model(model, X_val_vec, y_val)
+metrics = evaluate_model(model, X_val_vec, y_val)
+
+# 콘솔 + 파일 + W&B에 기록
+log_metrics(logger, metrics)
+
+wandb.finish()
 print("모델 학습 및 평가 완료")
 
 # 테스트셋 전처리 및 예측
@@ -44,5 +85,5 @@ print("테스트셋 전처리 및 예측 완료")
 print("결과 저장 시작")
 sample_submission = pd.read_csv("data/sample_submission.csv", encoding="utf-8-sig")
 sample_submission["generated"] = test_probs
-sample_submission.to_csv("data/raw/baseline_submission.csv", index=False)
+sample_submission.to_csv(predict_path, index=False)
 print("결과 저장 완료")

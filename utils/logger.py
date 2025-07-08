@@ -3,6 +3,12 @@ import os
 from datetime import datetime
 
 
+try:
+    import wandb
+except ImportError:
+    wandb = None
+
+
 # 로깅 설정 반환 함수
 def get_logger(name, save_dir="logs"):
     # 로그 파일 경로 설정
@@ -34,3 +40,11 @@ def get_logger(name, save_dir="logs"):
     logger.addHandler(file_handler)
 
     return logger
+
+
+# 콘솔 + 파일 + W&B metric 기록 함수
+def log_metrics(logger, metrics: dict, step: int = None):
+    for k, v in metrics.items():
+        logger.info(f"{k}: {v}")
+    if wandb and wandb.run is not None:
+        wandb.log(metrics, step=step)

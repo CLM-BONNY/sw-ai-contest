@@ -5,6 +5,7 @@ __pycache__/
 *.egg-info/
 *.pkl
 
+
 # Jupyter Notebook
 .ipynb_checkpoints/
 
@@ -34,3 +35,4 @@ models/
 # 기타
 .env
 .DS_Store
+wandb/

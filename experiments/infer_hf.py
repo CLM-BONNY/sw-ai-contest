@@ -1,4 +1,5 @@
 import yaml
+import wandb
 import pandas as pd
 import torch
 from transformers import Trainer, AutoTokenizer, AutoModelForSequenceClassification
@@ -7,17 +8,31 @@ from datasets import Dataset
 from utils.logger import get_logger
 from utils.seed import set_seed
 
-
 # config 파일 내부 설정 로딩
 with open("config/config.yaml", "r") as f:
     config = yaml.safe_load(f)
 
+project_name = config["project_name"]
 model_path = config["save_path"]
 test_path = config["test_path"]
 max_length = config["max_length"]
-output_path = config.get("predict_path", "predictions.csv")
+output_path = config["predict_path"]
 seed = config["seed"]
 
+# run_name 설정
+run_name = f"infer-{model_path.split('/')[-1]}"
+
+# W&B 설정
+wandb.init(
+    project=project_name,
+    name=run_name,
+    config={
+        "model_path": model_path,
+        "max_length": max_length,
+        "test_path": test_path,
+        "output_path": output_path,
+    },
+)
 
 # 시드 고정 및 로깅 설정
 set_seed(seed)
@@ -62,7 +77,11 @@ else:
     # 가장 큰 값의 인덱스를 예측 클래스 레이블로 사용
     pred_labels = torch.argmax(torch.tensor(preds.predictions), dim=1).numpy()
 
-# 추론 결과 저장
-submission = pd.DataFrame({"ID": df["ID"], "generated": pred_labels})
-submission.to_csv(output_path, index=False)
-logger.info(f"Prediction saved to {output_path}")
+wandb.finish()
+
+# 결과 저장
+print("결과 저장 시작")
+sample_submission = pd.read_csv("data/sample_submission.csv", encoding="utf-8-sig")
+sample_submission["generated"] = preds
+sample_submission.to_csv(output_path, index=False)
+print("결과 저장 완료")
