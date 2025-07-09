@@ -32,11 +32,12 @@ run_name = f"{model_name}-lr{lr}-bs{batch_size}-ep{epochs}"
 
 # 로거 설정
 logger = get_logger("HF-Train")
-
+entity = "clm-bonny-203ho" # 이 부분 추가
 # W&B 설정
 wandb.init(
     project=project_name,
     name=run_name,
+    entity=entity,  # W&B entity 설정
     config={
         "model": model_name,
         "lr": lr,

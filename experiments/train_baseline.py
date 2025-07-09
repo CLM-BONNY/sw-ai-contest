@@ -28,10 +28,11 @@ run_name = f"{model_name}-w{scale_pos_weight}-n{n_estimators}"
 
 # 로거 설정
 logger = get_logger("XGBoost-Baseline")
-
+entity = "clm-bonny-203ho" # 이 부분 추가
 # W&B 설정
 wandb.init(
     project=project_name,
+    entity=entity,  # W&B entity 설정
     name=run_name,
     config={
         "model": model_name,

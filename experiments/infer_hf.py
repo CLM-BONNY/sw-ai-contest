@@ -21,10 +21,11 @@ seed = config["seed"]
 
 # run_name 설정
 run_name = f"infer-{model_path.split('/')[-1]}"
-
+entity = "clm-bonny-203ho" # 이 부분 추가
 # W&B 설정
 wandb.init(
     project=project_name,
+    entity=entity,  # W&B entity 설정
     name=run_name,
     config={
         "model_path": model_path,
