@@ -1,9 +1,14 @@
 import yaml
+from peft import PeftModel
 import wandb
 import pandas as pd
 from sklearn.model_selection import train_test_split
 
 from datasets import Dataset
+
+import os
+
+os.environ["WANDB_MODE"] = "disabled"
 
 from src.tokenizer_hf import get_tokenizer
 from src.model_hf import get_model
@@ -56,6 +61,12 @@ logger = get_logger("HF-Train")
 df = pd.read_csv(train_path)
 df = df.rename(columns={"paragraph_text": "full_text"})  # 열 이름 통일
 
+# # 전체에서 20,000개만 샘플링 (라벨 비율 유지)
+# df_small, _ = train_test_split(
+#     df, train_size=20000, stratify=df["generated"], random_state=seed
+# )
+
+# 다시 8:2로 나눠서 train/val 구성
 train_df, val_df = train_test_split(
     df, test_size=0.2, stratify=df["generated"], random_state=seed
 )
@@ -103,13 +114,17 @@ trainer = train_model(
     },
 )
 
-# 학습 및 모델 저장
-logger.info("Start training...")
-trainer.train()
-
-logger.info("Saving model...")
-trainer.save_model(save_path)
-tokenizer.save_pretrained(save_path)
+# logger.info("Saving model...")
+# trainer.save_model(save_path)
+# tokenizer.save_pretrained(save_path)
+# trainer.train() 이후
+logger.info("Saving LoRA adapter only...")
+if isinstance(model, PeftModel):
+    adapter_save_path = os.path.join(save_path, "adapter")
+    model.save_pretrained(adapter_save_path)
+    logger.info(f"LoRA adapter 저장 완료: {adapter_save_path}")
+else:
+    logger.warning("현재 모델은 PeftModel이 아니므로 adapter 저장을 건너뜁니다.")
 
 # 최종 성능 평가 및 로깅 (W&B + 콘솔 + 파일)
 final_metrics = trainer.evaluate()

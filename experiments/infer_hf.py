@@ -1,3 +1,8 @@
+import sys
+import os
+
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+
 import yaml
 import wandb
 import pandas as pd
@@ -13,7 +18,8 @@ with open("config/config.yaml", "r") as f:
     config = yaml.safe_load(f)
 
 project_name = config["project_name"]
-model_path = config["save_path"]
+# model_path = config["save_path"]
+model_path = "models/hf_checkpoint/checkpoint-9718"
 test_path = config["test_path"]
 max_length = config["max_length"]
 output_path = config["predict_path"]
@@ -82,6 +88,6 @@ wandb.finish()
 # 결과 저장
 print("결과 저장 시작")
 sample_submission = pd.read_csv("data/sample_submission.csv", encoding="utf-8-sig")
-sample_submission["generated"] = preds
+sample_submission["generated"] = pred_labels
 sample_submission.to_csv(output_path, index=False)
 print("결과 저장 완료")
