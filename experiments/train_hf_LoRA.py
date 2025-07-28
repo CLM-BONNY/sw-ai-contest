@@ -11,7 +11,7 @@ import os
 os.environ["WANDB_MODE"] = "disabled"
 
 from src.tokenizer_hf import get_tokenizer
-from src.model_hf import get_model
+from src.model_hf_LoRA import get_model
 from src.trainer_hf import train_model
 from utils.seed import set_seed
 from utils.logger import get_logger, log_metrics
@@ -115,9 +115,13 @@ trainer = train_model(
 )
 
 # trainer.train() 이후
-logger.info("Saving model...")
-trainer.save_model(save_path)
-tokenizer.save_pretrained(save_path)
+logger.info("Saving LoRA adapter only...")
+if isinstance(model, PeftModel):
+    adapter_save_path = os.path.join(save_path, "adapter")
+    model.save_pretrained(adapter_save_path)
+    logger.info(f"LoRA adapter 저장 완료: {adapter_save_path}")
+else:
+    logger.warning("현재 모델은 PeftModel이 아니므로 adapter 저장을 건너뜁니다.")
 
 # 최종 성능 평가 및 로깅 (W&B + 콘솔 + 파일)
 final_metrics = trainer.evaluate()
