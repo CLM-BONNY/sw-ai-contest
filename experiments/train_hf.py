@@ -61,14 +61,14 @@ logger = get_logger("HF-Train")
 df = pd.read_csv(train_path)
 df = df.rename(columns={"paragraph_text": "full_text"})  # 열 이름 통일
 
-# # 전체에서 20,000개만 샘플링 (라벨 비율 유지)
-# df_small, _ = train_test_split(
-#     df, train_size=20000, stratify=df["generated"], random_state=seed
-# )
+# 전체에서 20,000개만 샘플링 (라벨 비율 유지)
+df_small, _ = train_test_split(
+    df, train_size=20000, stratify=df["generated"], random_state=seed
+)
 
 # 다시 8:2로 나눠서 train/val 구성
 train_df, val_df = train_test_split(
-    df, test_size=0.2, stratify=df["generated"], random_state=seed
+    df_small, test_size=0.2, stratify=df["generated"], random_state=seed
 )
 
 # 토크나이저 로딩
